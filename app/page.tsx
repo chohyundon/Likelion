@@ -1,5 +1,5 @@
-import ExampleComponent from "./components/example";
+import Main from "./components/main/Main";
 
 export default async function page() {
-  return <ExampleComponent />;
+  return <Main />;
 }
