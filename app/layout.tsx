@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Layout from "./layout/Layout";
 
 const pretendard = localFont({
   src: "../public/fonts/PretendardVariable.woff2",
@@ -20,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${pretendard.variable} antialiased`}>{children}</body>
+      <body className={`${pretendard.variable} antialiased`}>
+        <Layout>{children}</Layout>
+      </body>
     </html>
   );
 }
