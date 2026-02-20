@@ -6,10 +6,12 @@ export default function Button({
   children,
   isDashboard,
   onClick,
+  className,
 }: {
   children: React.ReactNode;
   isDashboard?: boolean;
   onClick?: () => void;
+  className?: string;
 }) {
   const router = useRouter();
 
@@ -23,7 +25,7 @@ export default function Button({
 
   return (
     <button
-      className="bg-blue-500 cursor-pointer text-white px-4 py-2 font-semibold rounded-md hover:bg-blue-600 transition-colors duration-300"
+      className={`bg-navy-600 cursor-pointer text-white px-4 py-2 font-semibold rounded-lg hover:bg-navy-500 transition-colors duration-300 ${className}`}
       onClick={handleClick}>
       {children}
     </button>

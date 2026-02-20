@@ -1,0 +1,36 @@
+# 의존성
+node_modules/
+vendor/
+.venv/
+__pycache__/
+
+# 빌드 출력
+dist/
+build/
+.next/
+out/
+
+# 대용량 파일
+*.min.js
+*.min.css
+*.map
+*.lock
+
+# 데이터
+*.csv
+*.sql
+*.sqlite
+*.db
+
+# 에셋
+*.png
+*.jpg
+*.gif
+*.mp4
+*.woff2
+*.ttf
+
+# 생성된 파일
+coverage/
+.turbo/
+.cache/

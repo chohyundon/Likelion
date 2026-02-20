@@ -1,5 +1,10 @@
 import Main from "./components/main/Main";
+import Layout from "./layout/Layout";
 
-export default async function page() {
-  return <Main />;
+export default function page() {
+  return (
+    <Layout>
+      <Main />
+    </Layout>
+  );
 }

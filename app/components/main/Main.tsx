@@ -1,11 +1,21 @@
-import Aside from "../aside/Aside";
-import DashBoard from "../dashboard/DashBoard";
+"use client";
+
+import { usePathname } from "next/navigation";
+import DashBoardWrite from "../dashboardWrite/DashBoard";
+import DashBoard from "./dashboard/DashBoard";
+import Home from "./home/Home";
 
 export default function Main() {
-  return (
-    <main className="w-full h-screen bg-gray-200 flex">
-      <Aside />
-      <DashBoard />
-    </main>
-  );
+  const pathname = usePathname();
+  const isWritePage = pathname === "/write";
+  const isDashBoardPage = pathname === "/dashboard";
+  const isHomePage = pathname === "/";
+
+  if (isWritePage) {
+    return <DashBoardWrite />;
+  }
+  if (isDashBoardPage) {
+    return <DashBoard />;
+  }
+  return <Home />;
 }

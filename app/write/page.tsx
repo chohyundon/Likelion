@@ -1,5 +1,10 @@
-import WriteScreen from "../components/write/WriteScreen";
+import DashBoardWrite from "../components/dashboardWrite/DashBoard";
+import Layout from "../layout/Layout";
 
-export default function page() {
-  return <WriteScreen />;
+export default function WritePage() {
+  return (
+    <Layout>
+      <DashBoardWrite />
+    </Layout>
+  );
 }
