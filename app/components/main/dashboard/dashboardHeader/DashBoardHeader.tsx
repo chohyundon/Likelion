@@ -11,7 +11,7 @@ export default function DashBoardHeader() {
   return (
     <header className="flex flex-wrap justify-between items-end gap-6 mb-12">
       <div className="flex flex-col gap-2">
-        <h2 className="text-white text-4xl font-black leading-tight tracking-tight">
+        <h2 className="text-white text-4xl font-black">
           Welcome back, {user?.user_metadata?.full_name ?? "Developer"}
         </h2>
         <p className="text-slate-400 text-lg font-mono">

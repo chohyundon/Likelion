@@ -7,13 +7,20 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "../modal/Modal";
 import AuthModal from "../modal/auth/AuthModal";
 import { useAuthStore } from "@/app/store/AuthStore";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Aside() {
-  const [activeItem, setActiveItem] = useState<string>("dashboard");
+  const pathname = usePathname();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
+  const router = useRouter();
+
+  const segment = pathname.replace(/^\//, "").split("/")[0] || "";
+  const activeItem = DashBoardSideList.some((item) => item.id === segment)
+    ? segment
+    : "";
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -64,6 +71,10 @@ export default function Aside() {
     }
   }, [openModal]);
 
+  const handleActiveItem = (id: string) => {
+    router.push(`/${id}`);
+  };
+
   return (
     <aside className="flex flex-col border-r border-navy-700 w-1/10 bg-navy-900/50">
       {openModal && (
@@ -76,12 +87,20 @@ export default function Aside() {
           {DashBoardSideList.map((item) => (
             <li
               key={item.id}
-              className={`flex gap-4 items-center text-sm cursor-pointer p-2 rounded-sm ${
+              role="button"
+              tabIndex={0}
+              className={`flex gap-4 items-center text-sm cursor-pointer p-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-inset ${
                 activeItem === item.id
-                  ? "bg-navy-600 text-white"
-                  : "text-slate-300 hover:bg-navy-800 hover:text-white"
+                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                  : "text-slate-300 hover:bg-navy-800 hover:text-white border border-transparent"
               }`}
-              onClick={() => setActiveItem(item.id)}>
+              onClick={() => handleActiveItem(item.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleActiveItem(item.id);
+                }
+              }}>
               <item.icon />
               {item.name}
             </li>

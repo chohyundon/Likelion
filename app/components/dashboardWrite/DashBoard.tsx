@@ -1,36 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Button from "../button/Button";
 import { TEMPLATES } from "@/app/constants/Template";
 import WriteSectionHeader from "../write/Header/WriteSectionHeader";
 import WriteInfoToolTip from "../write/infoTooltip/WriteInfoToolTip";
 import LoadingComponent from "../Loading/Loading";
 import { CheckCircle, Lightbulb, X } from "lucide-react";
+import { NAVY, dashboardWriteStyles } from "./dashboardWriteStyles";
+import { postOpenAi } from "@/app/services/postOpenAi";
+import { createClient } from "@/app/lib/supabase/client";
+import { useAuthStore } from "@/app/store/AuthStore";
+import { useRouter } from "next/navigation";
 
 const RECOMMENDED_KEYWORDS = ["JavaScript", "Optimization", "Web Dev"];
 
-const NAVY = {
-  bg: "bg-navy-950",
-  card: "bg-navy-900",
-  cardBorder: "border-navy-700",
-  input: "bg-navy-800/50 border-navy-600 text-white placeholder:text-slate-500",
-};
-
-const inputBase =
-  "w-full rounded-lg px-4 py-3 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 outline-none transition-all " +
-  NAVY.input;
-const sectionCard =
-  "p-6 rounded-xl border shadow-lg " + NAVY.card + " " + NAVY.cardBorder;
-const templateCardBase =
-  "group cursor-pointer border-2 p-4 rounded-xl transition-all";
-const keywordTag =
-  "flex items-center gap-1 bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-sm font-medium border border-amber-500/30";
-const suggestionBtn =
-  "text-xs font-medium px-2 py-1 bg-slate-700/80 text-slate-300 rounded hover:bg-slate-600 transition-colors";
+const { inputBase, sectionCard, templateCardBase, keywordTag, suggestionBtn } =
+  dashboardWriteStyles;
 
 export default function DashBoardWrite() {
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("til");
+  const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("TIL");
   const [blogTitleValue, setBlogTitleValue] = useState<string>("");
   const [blogDescriptionValue, setBlogDescriptionValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -40,6 +31,13 @@ export default function DashBoardWrite() {
     "프론트엔드",
   ]);
   const [keywordInput, setKeywordInput] = useState("");
+  const [generatedArticle, setGeneratedArticle] = useState<{
+    title: string;
+    content: string;
+    keywords: string[];
+    template: string;
+  } | null>(null);
+  const user = useAuthStore((state) => state.user);
 
   const removeKeyword = (index: number) => {
     setKeywords((prev) => prev.filter((_, i) => i !== index));
@@ -55,33 +53,68 @@ export default function DashBoardWrite() {
 
   const handleGenerateArticle = async () => {
     setIsLoading(true);
+
     try {
-      const response = await fetch("/api/openai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          selectedTemplate,
-          blogTitleValue,
-          blogDescriptionValue,
-          keywords,
-        }),
+      const response = await postOpenAi({
+        selectedTemplate,
+        blogTitleValue,
+        blogDescriptionValue,
+        keywords,
       });
-      const data = await response.json();
-      if (!response.ok) {
-        console.error(data?.error ?? "요청 실패");
-        return;
-      }
-      console.log(data.title, data.body, data.keywords);
+      const keywordsArray =
+        typeof response.keywords === "string"
+          ? response.keywords
+              .split(",")
+              .map((k: string) => k.trim())
+              .filter(Boolean)
+          : Array.isArray(response.keywords)
+          ? response.keywords
+          : [];
+      setGeneratedArticle({
+        title: response.title ?? "",
+        content: response.content ?? "",
+        keywords: keywordsArray,
+        template: selectedTemplate,
+      });
     } catch (e) {
-      console.error(e);
+      console.error("AI 생성 실패:", e);
     } finally {
       setIsLoading(false);
     }
   };
 
+  console.log(generatedArticle);
+
+  // 생성 성공 후에만 Supabase에 저장 (빈 데이터로 저장 방지)
+  useEffect(() => {
+    if (!generatedArticle || !generatedArticle.content.trim() || !user) return;
+
+    const saveGeneratedArticle = async () => {
+      const { data, error } = await supabase.from("템플릿").insert([
+        {
+          title: generatedArticle.title,
+          content: generatedArticle.content,
+          template_type: generatedArticle.template,
+          keywords: generatedArticle.keywords,
+          user_id: user.id,
+        },
+      ]);
+      if (error) {
+        console.error(error);
+      } else {
+        console.log("저장됨:", data);
+      }
+    };
+    saveGeneratedArticle();
+  }, [generatedArticle, supabase, user]);
+
   if (isLoading) {
     return <LoadingComponent />;
   }
+
+  const handleSampleView = () => {
+    router.push("/post");
+  };
 
   return (
     <main
@@ -97,7 +130,9 @@ export default function DashBoardWrite() {
             </p>
           </div>
 
-          <button className="flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-slate-700 text-slate-200 text-sm font-bold hover:bg-slate-600 border border-slate-600 transition-colors">
+          <button
+            onClick={handleSampleView}
+            className="flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-slate-700 text-slate-200 text-sm font-bold hover:bg-slate-600 border border-slate-600 transition-colors">
             샘플 보기
           </button>
         </section>

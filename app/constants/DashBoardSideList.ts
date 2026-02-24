@@ -7,7 +7,7 @@ export const DashBoardSideList = [
     icon: LayoutDashboard,
   },
   {
-    id: "my-articles",
+    id: "mypage",
     name: "내 글 목록",
     icon: FileText,
   },

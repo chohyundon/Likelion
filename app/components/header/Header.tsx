@@ -61,7 +61,10 @@ export default function Header({ isHomePage }: { isHomePage?: boolean }) {
         <Logo />
         <div className="flex gap-4 ml-auto items-center">
           {DashBoardSideList.map((item) => (
-            <Link key={item.id} href={`${item.id}`}>
+            <Link
+              key={item.id}
+              href={`/${item.id}`}
+              className="rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-900">
               <p className="text-sm font-medium text-slate-200 hover:text-white transition-colors">
                 {item.name}
               </p>
@@ -93,7 +96,10 @@ export default function Header({ isHomePage }: { isHomePage?: boolean }) {
       {modalOpen && <HeaderModal setModalOpen={setModalOpen} />}
       <div className="flex gap-4 ml-auto items-center">
         {DashBoardSideList.map((item) => (
-          <Link key={item.id} href={`${item.id}`}>
+          <Link
+            key={item.id}
+            href={`/${item.id}`}
+            className="rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-900">
             <p className="text-sm font-medium text-slate-200 hover:text-white transition-colors">
               {item.name}
             </p>
