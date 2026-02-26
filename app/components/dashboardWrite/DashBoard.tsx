@@ -83,30 +83,36 @@ export default function DashBoardWrite() {
     }
   };
 
-  console.log(generatedArticle);
-
-  // 생성 성공 후에만 Supabase에 저장 (빈 데이터로 저장 방지)
+  // 생성 성공 후 Supabase에 저장하고, 저장된 id로 /post/[id] 이동
   useEffect(() => {
     if (!generatedArticle || !generatedArticle.content.trim() || !user) return;
 
-    const saveGeneratedArticle = async () => {
-      const { data, error } = await supabase.from("템플릿").insert([
-        {
-          title: generatedArticle.title,
-          content: generatedArticle.content,
-          template_type: generatedArticle.template,
-          keywords: generatedArticle.keywords,
-          user_id: user.id,
-        },
-      ]);
+    const saveAndGoToPost = async () => {
+      const { data, error } = await supabase
+        .from("템플릿")
+        .insert([
+          {
+            title: generatedArticle.title,
+            content: generatedArticle.content,
+            template_type: generatedArticle.template,
+            keywords: generatedArticle.keywords,
+            user_id: user.id,
+          },
+        ])
+        .select("id")
+        .single();
+
       if (error) {
         console.error(error);
-      } else {
-        console.log("저장됨:", data);
+        return;
+      }
+      const id = data?.id;
+      if (id) {
+        router.push(`/post/${id}`);
       }
     };
-    saveGeneratedArticle();
-  }, [generatedArticle, supabase, user]);
+    saveAndGoToPost();
+  }, [generatedArticle, supabase, user, router]);
 
   if (isLoading) {
     return <LoadingComponent />;
@@ -165,7 +171,7 @@ export default function DashBoardWrite() {
                       className={`text-3xl mb-2 block ${
                         isSelected ? "text-amber-400" : "text-slate-500"
                       }`}>
-                      {tpl.icon}
+                      <tpl.icon className="size-8 text-amber-300" />
                     </span>
                     <h3 className="text-white font-bold text-lg mb-1">
                       {tpl.name}

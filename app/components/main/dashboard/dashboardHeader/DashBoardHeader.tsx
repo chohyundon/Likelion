@@ -3,10 +3,18 @@
 import Button from "@/app/components/button/Button";
 import { useAuthStore } from "@/app/store/AuthStore";
 import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function DashBoardHeader() {
   const user = useAuthStore((state) => state.user);
   const router = useRouter();
+  const handleWrite = () => {
+    if (user) {
+      router.push("/write");
+    } else {
+      return toast.error("로그인 후 이용해주세요.");
+    }
+  };
 
   return (
     <header className="flex flex-wrap justify-between items-end gap-6 mb-12">
@@ -14,13 +22,19 @@ export default function DashBoardHeader() {
         <h2 className="text-white text-4xl font-black">
           Welcome back, {user?.user_metadata?.full_name ?? "Developer"}
         </h2>
-        <p className="text-slate-400 text-lg font-mono">
-          system.status: <span className="text-amber-400">ready_to_write</span>
-        </p>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="dark"
+      />
       <Button
         className="font-bold shadow-lg hover:bg-navy-500 transition-all"
-        onClick={() => router.push("/write")}>
+        onClick={handleWrite}>
         새로운 글 작성
       </Button>
     </header>

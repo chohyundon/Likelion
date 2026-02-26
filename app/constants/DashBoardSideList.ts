@@ -1,4 +1,4 @@
-import { LayoutDashboard, FileText, Puzzle, ChartBar } from "lucide-react";
+import { LayoutDashboard, FileText, Puzzle } from "lucide-react";
 
 export const DashBoardSideList = [
   {
@@ -12,13 +12,8 @@ export const DashBoardSideList = [
     icon: FileText,
   },
   {
-    id: "templates",
+    id: "example",
     name: "템플릿",
     icon: Puzzle,
-  },
-  {
-    id: "analysis",
-    name: "분석",
-    icon: ChartBar,
   },
 ];

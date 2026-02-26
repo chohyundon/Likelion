@@ -1,18 +1,44 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import Footer from "../../footer/Footer";
+import {
+  ArrowRight,
+  Bot,
+  Sparkle,
+  Play,
+  Braces,
+  SquareDashedBottomCode,
+  CopyPlus,
+} from "lucide-react";
+import { useAuthStore } from "@/app/store/AuthStore";
+import { useState } from "react";
+import AuthModal from "../../modal/auth/AuthModal";
 
 export default function Home() {
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsOpenModal(true);
+  };
+
   return (
     <div className="relative min-h-screen overflow-x-hidden w-full h-full bg-navy-950">
+      {isOpenModal && (
+        <AuthModal setOpenModal={setIsOpenModal} isHomePage={true} />
+      )}
       <main className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-32 flex flex-col items-center text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-8">
-          <span className="material-symbols-outlined text-base">
-            auto_awesome
-          </span>
+          <Bot className="size-4" />
           GPT-4o 기반 기술 블로그 작성 지원
         </div>
         <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 max-w-4xl leading-[1.1] text-white">
           개발자의 글쓰기, <br />
-          <span className="text-amber-400">AI로 더 스마트하게</span>
+          <span className="text-amber-400">
+            <Sparkle className="size-4" /> AI로 더 스마트하게
+          </span>
         </h1>
         <p className="text-lg md:text-xl text-slate-300 max-w-2xl mb-12 leading-relaxed">
           복잡한 기술 블로그 작성, 이제 AI와 개발자 전용 템플릿으로{" "}
@@ -20,14 +46,16 @@ export default function Home() {
           그대로, 설명은 완벽하게.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 mb-24 w-full justify-center">
-          <button className="bg-amber-500 hover:bg-amber-400 text-white text-lg font-bold px-10 py-4 rounded-xl transition-all shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2">
-            Start for Free{" "}
-            <span className="material-symbols-outlined">arrow_forward</span>
+          <button
+            onClick={() =>
+              user ? router.push("/dashboard") : handleOpenModal()
+            }
+            className="cursor-pointer bg-amber-500 hover:bg-amber-400 text-white text-lg font-bold px-10 py-4 rounded-xl transition-all shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2">
+            Start for Free <ArrowRight className="size-4" />
           </button>
-          <button className="bg-navy-800 border border-navy-600 text-slate-200 text-lg font-bold px-10 py-4 rounded-xl hover:bg-navy-700 transition-all flex items-center justify-center gap-2">
-            <span className="material-symbols-outlined">play_circle</span> View
-            Demo
-          </button>
+          <span className="bg-navy-800 border border-navy-600 text-slate-200 text-lg font-bold px-10 py-4 rounded-xl hover:bg-navy-700 transition-all flex items-center justify-center gap-2">
+            <Play className="size-4" /> View Demo
+          </span>
         </div>
 
         <div className="relative w-full max-w-5xl group">
@@ -123,9 +151,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="p-8 rounded-2xl bg-navy-900/50 border border-navy-700 hover:border-amber-500/50 transition-all group">
             <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-amber-400 text-3xl">
-                psychology
-              </span>
+              <Braces className="size-6 text-amber-400" />
             </div>
             <h3 className="text-xl font-bold mb-3 text-white">AI Generation</h3>
             <p className="text-slate-400 text-sm leading-relaxed">
@@ -136,9 +162,7 @@ export default function Home() {
 
           <div className="p-8 rounded-2xl bg-navy-900/50 border border-navy-700 hover:border-amber-500/50 transition-all group">
             <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-amber-400 text-3xl">
-                markdown
-              </span>
+              <SquareDashedBottomCode className="size-6 text-amber-400" />
             </div>
             <h3 className="text-xl font-bold mb-3 text-white">
               Markdown Editor
@@ -151,9 +175,7 @@ export default function Home() {
 
           <div className="p-8 rounded-2xl bg-navy-900/50 border border-navy-700 hover:border-amber-500/50 transition-all group">
             <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-amber-400 text-3xl">
-                vertical_split
-              </span>
+              <CopyPlus className="size-6 text-amber-400" />
             </div>
             <h3 className="text-xl font-bold mb-3 text-white">
               Multiple Templates
@@ -175,7 +197,11 @@ export default function Home() {
           <p className="text-white/90 mb-10 text-lg relative z-10">
             수백 명의 개발자가 이미 TechWrite AI와 함께 성장하고 있습니다.
           </p>
-          <button className="bg-white text-amber-600 text-lg font-bold px-12 py-4 rounded-xl shadow-2xl hover:bg-slate-100 transition-all relative z-10">
+          <button
+            onClick={() =>
+              user ? router.push("/dashboard") : handleOpenModal()
+            }
+            className="cursor-pointer bg-white text-amber-600 text-lg font-bold px-12 py-4 rounded-xl shadow-2xl hover:bg-slate-100 transition-all relative z-10">
             Get Started Free
           </button>
         </div>

@@ -63,3 +63,24 @@ export const Template = [
   `,
   },
 ];
+
+export const TEMPLATE_ID = [
+  {
+    id: "TIL",
+    name: "TIL",
+    description: `하루 동안 학습한 내용을 핵심 위주로 정리합니다. 
+  개념 요약과 간단한 예제를 통해 배운 내용을 빠르게 복습하고 기록하는 공간입니다.`,
+  },
+  {
+    id: "Deep_Dive",
+    name: "Deep Dive",
+    description: `특정 주제를 깊이 있게 분석합니다. 
+  동작 원리, 내부 구조, 성능 관점까지 확장하여 기술을 구조적으로 이해하는 글을 다룹니다.`,
+  },
+  {
+    id: "trouble-shooting",
+    name: "Trouble Shooting",
+    description: `개발 과정에서 겪은 문제와 해결 과정을 기록합니다. 
+  에러 원인 분석부터 해결 방법, 배운 점까지 정리하는 실전 경험 중심의 글입니다.`,
+  },
+];

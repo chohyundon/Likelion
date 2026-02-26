@@ -107,10 +107,6 @@ export default function Aside() {
           ))}
         </ul>
         <div className="mt-auto mb-4 justify-center w-full mx-auto border-t border-navy-700 flex flex-col gap-2">
-          <div className="flex gap-2 items-center cursor-pointer p-2 rounded-sm text-slate-300 hover:bg-navy-800 hover:text-white">
-            <Settings className="shrink-0" />
-            <p>설정</p>
-          </div>
           {user ? (
             <div className="flex flex-col gap-2">
               <div className="flex gap-2 items-center p-2 rounded-sm">

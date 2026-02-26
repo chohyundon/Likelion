@@ -11,8 +11,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   if (isHomePage) {
     return (
       <div className="w-full h-screen flex flex-col overflow-hidden">
-        <Header isHomePage={true} />
-        {children}
+        <Header />
+        <div className="flex-1 min-h-0 overflow-auto">{children}</div>
       </div>
     );
   }
