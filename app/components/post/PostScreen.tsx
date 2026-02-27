@@ -10,33 +10,35 @@ import { prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "./markDown.css";
 import { ChevronRight, Sparkles, FileDown } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
-import TextEditModal from "../modal/textedit/TextEditModal";
 
 type PostScreenProps = { postId?: string };
 
 export default function PostScreen({ postId }: PostScreenProps) {
   const supabase = useMemo(() => createClient(), []);
-  const [textEditModalOpen, setTextEditModalOpen] = useState(false);
   const [title, setTitle] = useState<string>(
     "기술 블로그 포스트 - 2024 AI 트렌드"
   );
   const [content, setContent] = useState<string>("");
+  const [templateType, setTemplateType] = useState<string>("");
 
   useEffect(() => {
     if (!postId) return;
     const fetchPost = async () => {
       const { data, error } = await supabase
         .from("템플릿")
-        .select("title, content")
+        .select("title, content, template_type")
         .eq("id", postId)
         .single();
       if (!error && data) {
         setTitle(data.title ?? "기술 블로그 포스트 - 2024 AI 트렌드");
         setContent(data.content ?? "");
+        setTemplateType(data.template_type ?? "");
       }
     };
     fetchPost();
   }, [postId, supabase]);
+
+  console.log(title);
 
   const handleEdit = async () => {
     const { error } = await supabase
@@ -64,9 +66,6 @@ export default function PostScreen({ postId }: PostScreenProps) {
     const selection = window.getSelection();
     if (selection) {
       const selectedText = selection.toString();
-      if (selectedText.length > 0) {
-        setTextEditModalOpen(true);
-      }
     }
   };
 
@@ -78,6 +77,10 @@ export default function PostScreen({ postId }: PostScreenProps) {
           href="/mypage">
           내 포스트
         </Link>
+        <ChevronRight className="size-4 text-slate-400" />
+        <span className="text-slate-400 text-sm font-medium">
+          {templateType}
+        </span>
         <ChevronRight className="size-4 text-slate-400" />
         <span className="text-white text-sm font-semibold">{title}</span>
       </div>
