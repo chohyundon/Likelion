@@ -10,7 +10,7 @@ import { useEffect, useMemo } from "react";
 import HeaderModal from "../modal/header/HeaderModal";
 import AuthModal from "../modal/auth/AuthModal";
 
-export default function Header() {
+export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const modalRef = useRef<HTMLDivElement>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const user = useAuthStore((state) => state.user);
@@ -48,7 +48,7 @@ export default function Header() {
   };
 
   return (
-    <header className="flex h-1/14 items-center gap-6 w-full p-6 border-b-2 border-navy-700 relative">
+    <header className="flex h-1/14 items-center gap-4 sm:gap-6 w-full p-4 sm:p-6 border-b-2 border-navy-700 relative">
       {modalOpen && user && <HeaderModal setModalOpen={setModalOpen} />}
       {modalOpen && !user && (
         <AuthModal
@@ -57,8 +57,28 @@ export default function Header() {
           modalRef={modalRef as React.RefObject<HTMLDivElement>}
         />
       )}
+      {onMenuClick && (
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="md:hidden p-2 -ml-2 rounded-lg text-slate-300 hover:text-white hover:bg-navy-800 transition-colors"
+          aria-label="메뉴 열기">
+          <svg
+            className="size-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+      )}
       <Logo />
-      <div className="flex gap-4 ml-auto items-center">
+      <div className="hidden md:flex gap-4 ml-auto items-center">
         {DashBoardSideList.map((item) => (
           <Link
             key={item.id}
@@ -70,22 +90,24 @@ export default function Header() {
           </Link>
         ))}
       </div>
-      {user?.user_metadata?.avatar_url ? (
-        <img
-          src={user?.user_metadata?.avatar_url}
-          alt="유저프로필이미지"
-          className="size-8 rounded-full object-cover shrink-0 cursor-pointer"
-          onClick={handleLogout}
-        />
-      ) : (
-        <div
-          className="flex items-center justify-center shrink-0 text-slate-300 cursor-pointer bg-navy-500 rounded-full p-2"
-          onClick={handleLogin}>
-          <p className="text-sm font-medium text-slate-200 hover:text-white transition-colors">
-            로그인
-          </p>
-        </div>
-      )}
+      <div className="flex md:contents gap-2 items-center ml-auto">
+        {user?.user_metadata?.avatar_url ? (
+          <img
+            src={user?.user_metadata?.avatar_url}
+            alt="유저프로필이미지"
+            className="size-8 rounded-full object-cover shrink-0 cursor-pointer"
+            onClick={handleLogout}
+          />
+        ) : (
+          <div
+            className="flex items-center justify-center shrink-0 text-slate-300 cursor-pointer bg-navy-500 rounded-full p-2"
+            onClick={handleLogin}>
+            <p className="text-sm font-medium text-slate-200 hover:text-white transition-colors">
+              로그인
+            </p>
+          </div>
+        )}
+      </div>
     </header>
   );
 }

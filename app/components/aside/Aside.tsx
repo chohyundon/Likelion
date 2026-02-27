@@ -2,14 +2,19 @@
 
 import { DashBoardSideList } from "@/app/constants/DashBoardSideList";
 import { createClient } from "@/app/lib/supabase/client";
-import { CircleUserRound, LogOut, Settings } from "lucide-react";
+import { CircleUserRound, LogOut, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "../modal/Modal";
 import AuthModal from "../modal/auth/AuthModal";
 import { useAuthStore } from "@/app/store/AuthStore";
 import { usePathname, useRouter } from "next/navigation";
 
-export default function Aside() {
+type AsideProps = {
+  open?: boolean;
+  onClose?: () => void;
+};
+
+export default function Aside({ open = true, onClose }: AsideProps) {
   const pathname = usePathname();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -73,39 +78,69 @@ export default function Aside() {
 
   const handleActiveItem = (id: string) => {
     router.push(`/${id}`);
+    onClose?.();
   };
 
   return (
-    <aside className="flex flex-col border-r border-navy-700 w-1/10 bg-navy-900/50">
-      {openModal && (
-        <Modal ref={modalRef as React.RefObject<HTMLDivElement>}>
-          <AuthModal setOpenModal={setOpenModal} />
-        </Modal>
+    <>
+      {/* 모바일: 배경 딤 */}
+      {onClose && (
+        <div
+          className={`fixed inset-0 z-40 bg-black/50 transition-opacity md:hidden ${
+            open ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={onClose}
+          aria-hidden
+        />
       )}
-      <nav className="flex flex-1 flex-col w-full">
-        <ul className="flex flex-col gap-2 w-4/5 mx-auto py-2">
-          {DashBoardSideList.map((item) => (
-            <li
-              key={item.id}
-              role="button"
-              tabIndex={0}
-              className={`flex gap-4 items-center text-sm cursor-pointer p-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-inset ${
-                activeItem === item.id
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                  : "text-slate-300 hover:bg-navy-800 hover:text-white border border-transparent"
-              }`}
-              onClick={() => handleActiveItem(item.id)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  handleActiveItem(item.id);
-                }
-              }}>
-              <item.icon />
-              {item.name}
-            </li>
-          ))}
-        </ul>
+      <aside
+        className={`
+          flex flex-col border-r border-navy-700 bg-navy-900/50
+          w-48 sm:w-52 md:w-56
+          fixed md:relative inset-y-0 left-0 z-50 md:z-auto
+          transform transition-transform duration-200 ease-out
+          ${onClose && !open ? "-translate-x-full md:translate-x-0" : "translate-x-0"}
+        `}>
+        {onClose && (
+          <div className="flex items-center justify-end p-2 border-b border-navy-700 md:hidden">
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-navy-800 transition-colors"
+              aria-label="메뉴 닫기">
+              <X className="size-5" />
+            </button>
+          </div>
+        )}
+        {openModal && (
+          <Modal ref={modalRef as React.RefObject<HTMLDivElement>}>
+            <AuthModal setOpenModal={setOpenModal} />
+          </Modal>
+        )}
+        <nav className="flex flex-1 flex-col w-full overflow-y-auto">
+          <ul className="flex flex-col gap-2 w-[85%] mx-auto py-2">
+            {DashBoardSideList.map((item) => (
+              <li
+                key={item.id}
+                role="button"
+                tabIndex={0}
+                className={`flex gap-4 items-center text-sm cursor-pointer p-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-inset ${
+                  activeItem === item.id
+                    ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                    : "text-slate-300 hover:bg-navy-800 hover:text-white border border-transparent"
+                }`}
+                onClick={() => handleActiveItem(item.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleActiveItem(item.id);
+                  }
+                }}>
+                <item.icon />
+                {item.name}
+              </li>
+            ))}
+          </ul>
         <div className="mt-auto mb-4 justify-center w-full mx-auto border-t border-navy-700 flex flex-col gap-2">
           {user ? (
             <div className="flex flex-col gap-2">
@@ -150,7 +185,7 @@ export default function Aside() {
           )}
         </div>
       </nav>
-      {/* <UserComponent /> */}
     </aside>
+    </>
   );
 }

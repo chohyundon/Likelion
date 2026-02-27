@@ -25,7 +25,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden w-full h-full bg-navy-950">
+    <div className="relative min-h-screen w-full h-full bg-navy-950">
       {isOpenModal && (
         <AuthModal setOpenModal={setIsOpenModal} isHomePage={true} />
       )}
