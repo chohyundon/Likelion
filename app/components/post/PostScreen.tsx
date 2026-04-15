@@ -38,8 +38,6 @@ export default function PostScreen({ postId }: PostScreenProps) {
     fetchPost();
   }, [postId, supabase]);
 
-  console.log(title);
-
   const handleEdit = async () => {
     const { error } = await supabase
       .from("템플릿")
