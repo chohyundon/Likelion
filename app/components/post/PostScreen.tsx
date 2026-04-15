@@ -85,9 +85,6 @@ export default function PostScreen({ postId }: PostScreenProps) {
         <span className="text-white text-sm font-semibold">{title}</span>
       </div>
       <div className="flex flex-wrap items-center mt-4 justify-between gap-4 px-4 py-2 bg-navy-900 border border-navy-700 rounded-t-xl">
-        <ul>
-          <li></li>
-        </ul>
         <button
           onClick={handleDownload}
           className="flex ml-auto items-center justify-center rounded-lg h-9 px-4 bg-blue-500/15 text-blue-400 border border-blue-500/25 hover:opacity-50 cursor-pointer transition-all font-semibold text-sm">
