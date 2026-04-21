@@ -1,4 +1,5 @@
 const nextConfig = {
+  reactCompiler: true,
   turbopack: {},
   images: {
     remotePatterns: [

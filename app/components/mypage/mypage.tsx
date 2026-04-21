@@ -2,7 +2,7 @@
 
 import { createClient } from "@/app/lib/supabase/client";
 import { DatabaseDocument } from "@/types/database";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ChevronDown,
   ArrowLeft,
@@ -20,7 +20,7 @@ import { useAuthStore } from "@/app/store/AuthStore";
 const TEMPLATES_PER_PAGE = 6;
 
 export default function MypageScreen() {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = createClient();
   const [templates, setTemplates] = useState<DatabaseDocument[]>([]);
   const modalRef = useRef<HTMLDivElement>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -54,7 +54,7 @@ export default function MypageScreen() {
       setIsLoading(false);
     };
     getTemplates();
-  }, [supabase, user?.id]);
+  }, [user?.id]);
 
   useEffect(() => {
     setCurrentPage(0);

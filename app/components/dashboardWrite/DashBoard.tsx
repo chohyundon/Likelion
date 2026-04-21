@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../button/Button";
 import { TEMPLATES } from "@/app/constants/Template";
 import WriteSectionHeader from "../write/Header/WriteSectionHeader";
@@ -20,7 +20,7 @@ const { inputBase, sectionCard, templateCardBase, keywordTag, suggestionBtn } =
 
 export default function DashBoardWrite() {
   const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = createClient();
   const [selectedTemplate, setSelectedTemplate] = useState<string>("TIL");
   const [blogTitleValue, setBlogTitleValue] = useState<string>("");
   const [blogDescriptionValue, setBlogDescriptionValue] = useState<string>("");
@@ -112,7 +112,7 @@ export default function DashBoardWrite() {
       }
     };
     saveAndGoToPost();
-  }, [generatedArticle, supabase, user, router]);
+  }, [generatedArticle, user, router]);
 
   if (isLoading) {
     return <LoadingComponent />;
