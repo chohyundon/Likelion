@@ -9,14 +9,8 @@ import { DatabaseDocument } from "@/types/database";
 import Link from "next/link";
 import { useAuthStore } from "@/app/store/AuthStore";
 import { getUserData } from "@/app/services/getUserData";
-
-const TEMPLATE_IMAGES: Record<string, string> = {
-  TIL: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&h=340&fit=crop",
-  Deep_Dive:
-    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=340&fit=crop",
-  "trouble-shooting":
-    "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=600&h=340&fit=crop",
-};
+import { TEMPLATE_IMAGES } from "@/app/constants/Template";
+import { recentTemplates } from "./model/RecentTemplate";
 
 export default function DashBoard() {
   const [templates, setTemplates] = useState<DatabaseDocument[]>([]);
@@ -34,14 +28,7 @@ export default function DashBoard() {
     getTemplates();
   }, [user?.id]);
 
-  console.log(templates);
-
-  const recentTemplates = [...templates]
-    .sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    )
-    .slice(0, 3);
+  const recentTemplatesData = recentTemplates(templates);
 
   return (
     <>
@@ -95,10 +82,10 @@ export default function DashBoard() {
                 전체 보기
               </Link>
             </div>
-            {user ? (
+            {templates && (
               <div className="space-y-3">
                 <div className="flex flex-col gap-4">
-                  {recentTemplates.length === 0 ? (
+                  {recentTemplatesData.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-6 bg-navy-900/50 border border-navy-700 border-dashed rounded-xl text-center">
                       <p className="text-slate-400 text-sm mb-1">
                         아직 작성한 문서가 없어요
@@ -108,7 +95,7 @@ export default function DashBoard() {
                       </p>
                     </div>
                   ) : (
-                    recentTemplates.map((template) => (
+                    recentTemplatesData.map((template) => (
                       <div
                         key={template.id}
                         className="flex items-center justify-between p-6 bg-navy-900 border border-navy-700 rounded-xl hover:bg-navy-800 transition-all cursor-pointer">
@@ -125,12 +112,6 @@ export default function DashBoard() {
                     ))
                   )}
                 </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-16 px-6 bg-navy-900/50 border border-navy-700 border-dashed rounded-xl text-center">
-                <p className="text-slate-400 text-sm mb-1">
-                  로그인하면 작성한 문서를 볼 수 있어요
-                </p>
               </div>
             )}
           </section>

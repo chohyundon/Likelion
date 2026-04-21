@@ -20,3 +20,13 @@ export const TEMPLATES = [
     icon: Search,
   },
 ] as const;
+
+export const TEMPLATE_IMAGES: Record<string, string> = {
+  TIL: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&h=340&fit=crop",
+  Deep_Dive:
+    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=340&fit=crop",
+  Trouble_Shooting:
+    "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=600&h=340&fit=crop",
+};
+
+export const TEMPLATES_PER_PAGE = 6;

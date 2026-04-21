@@ -13,7 +13,6 @@ export default function TemplateId() {
   const id = params.id as string;
 
   const content = MOCK_TEMPLATES[0].filter((t) => t.id === id);
-  console.log(content);
 
   return (
     <main className="flex-1 p-6 sm:p-8 w-full min-h-full bg-navy-950 overflow-y-auto">

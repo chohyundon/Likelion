@@ -51,7 +51,7 @@ export default function AuthModal({
               social.className ?? "bg-navy-600 text-white hover:opacity-90"
             }`}
             onClick={() => {
-              void SocialLogin(social.name);
+              SocialLogin(social.name);
             }}>
             <Image
               src={social.icon}
