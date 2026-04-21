@@ -2,14 +2,8 @@
 
 import { TEMPLATES } from "@/app/constants/Template";
 import { useRouter } from "next/navigation";
-
-const idBadgeStyle: Record<string, string> = {
-  TIL: "text-emerald-400 font-semibold text-xs uppercase tracking-wider bg-emerald-500/15 border border-emerald-500/30 rounded-lg px-3 py-1.5",
-  Trouble_Shooting:
-    "text-amber-300 font-semibold text-xs bg-amber-500/15 border border-amber-500/30 rounded-lg px-3 py-1.5",
-  Deep_Dive:
-    "text-sky-400 font-semibold text-xs bg-sky-500/15 border border-sky-500/30 rounded-lg px-3 py-1.5",
-};
+import { IdBadgeStyle } from "@/app/constants/BadgeStyle";
+import Button from "../button/Button";
 
 export default function Template() {
   const router = useRouter();
@@ -36,7 +30,7 @@ export default function Template() {
                 <tpl.icon className="bg-amber-200/10 rounded-md p-2 size-8 text-amber-300" />
                 <span
                   className={
-                    idBadgeStyle[tpl.id] ??
+                    IdBadgeStyle[tpl.id] ??
                     "text-slate-400 text-xs font-medium bg-navy-600/50 rounded-lg px-3 py-1.5"
                   }>
                   {tpl.id}
@@ -49,11 +43,11 @@ export default function Template() {
                 <p className="text-slate-400 text-sm">{tpl.description}</p>
               </div>
               <div className="w-full mx-auto mt-10">
-                <button
+                <Button
                   onClick={() => handlePreview(tpl.id)}
-                  className="w-full py-2.5 cursor-pointer bg-navy-600 text-white font-bold rounded-lg hover:bg-navy-500 transition-all">
+                  className="w-full py-2.5 bg-navy-600 text-white font-bold rounded-lg hover:bg-navy-500 transition-all">
                   Preview
-                </button>
+                </Button>
               </div>
             </div>
           ))}

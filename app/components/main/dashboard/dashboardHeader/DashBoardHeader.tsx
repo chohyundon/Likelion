@@ -8,6 +8,7 @@ import { toast, ToastContainer } from "react-toastify";
 export default function DashBoardHeader() {
   const user = useAuthStore((state) => state.user);
   const router = useRouter();
+
   const handleWrite = () => {
     if (user) {
       router.push("/write");
@@ -20,7 +21,7 @@ export default function DashBoardHeader() {
     <header className="flex flex-wrap justify-between items-end gap-6 mb-12">
       <div className="flex flex-col gap-2">
         <h2 className="text-white text-4xl font-black">
-          Welcome back, {user?.user_metadata?.full_name ?? "Developer"}
+          어서오세요, {`${user?.user_metadata?.full_name} 님`}
         </h2>
       </div>
       <ToastContainer
@@ -33,7 +34,7 @@ export default function DashBoardHeader() {
         theme="dark"
       />
       <Button
-        className="font-bold shadow-lg hover:bg-navy-500 transition-all"
+        className="font-bold shadow-lg bg-amber-500 hover:bg-amber-600 transition-all text-white"
         onClick={handleWrite}>
         새로운 글 작성
       </Button>

@@ -1,26 +1,24 @@
 "use client";
 
-import { createClient } from "@/app/lib/supabase/client";
 import { DatabaseDocument } from "@/types/database";
 import { useEffect, useRef, useState } from "react";
-import {
-  ChevronDown,
-  ArrowLeft,
-  ArrowRight,
-  Pencil,
-  Trash2,
-} from "lucide-react";
 import DeleteModal from "../modal/delete/DeleteModal";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
-import FilterModal from "../modal/filter/FilterModal";
 import { useFilterStore } from "@/app/store/FilterStore";
 import { useAuthStore } from "@/app/store/AuthStore";
-
-const TEMPLATES_PER_PAGE = 6;
+import { getUserData } from "@/app/services/getUserData";
+import { deleteTemplate } from "@/app/services/deleteTemplate";
+import { TEMPLATES_PER_PAGE } from "@/app/constants/Template";
+import MypageToolbar from "./MypageToolbar";
+import MypagePostsTable from "./MypagePostsTable";
+import MypagePagination from "./MypagePagination";
+import {
+  filterPostsByTypeAndSearch,
+  sortPostsByCreatedDesc,
+} from "./lib/postList";
 
 export default function MypageScreen() {
-  const supabase = createClient();
   const [templates, setTemplates] = useState<DatabaseDocument[]>([]);
   const modalRef = useRef<HTMLDivElement>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -42,18 +40,14 @@ export default function MypageScreen() {
       setIsLoading(false);
       return;
     }
-    const getTemplates = async () => {
+    const load = async () => {
       setIsLoading(true);
-      const { data, error } = await supabase
-        .from("템플릿")
-        .select("*")
-        .eq("user_id", user.id);
-      if (error) console.error(error);
-      else setTemplates(data ?? []);
+      const data = await getUserData(user.id);
+      setTemplates(data ?? []);
       setCurrentPage(0);
       setIsLoading(false);
     };
-    getTemplates();
+    load();
   }, [user?.id]);
 
   useEffect(() => {
@@ -70,7 +64,7 @@ export default function MypageScreen() {
   };
 
   const handleConfirmDelete = async (id: string) => {
-    const { error } = await supabase.from("템플릿").delete().eq("id", id);
+    const error = await deleteTemplate(id);
     if (error) {
       console.error(error);
     } else {
@@ -80,29 +74,27 @@ export default function MypageScreen() {
     setDeleteTargetId(null);
   };
 
-  const filteredTemplates = templates.filter((template) => {
-    if (
-      selectedTemplateType !== "전체" &&
-      template.template_type !== selectedTemplateType
-    )
-      return false;
-    if (searchQuery.trim() && !template.title.includes(searchQuery.trim()))
-      return false;
-    return true;
-  });
+  const filteredTemplates = filterPostsByTypeAndSearch(
+    templates,
+    selectedTemplateType,
+    searchQuery
+  );
 
   const totalPages = Math.max(
     1,
     Math.ceil(filteredTemplates.length / TEMPLATES_PER_PAGE)
   );
-  const start = currentPage * TEMPLATES_PER_PAGE;
-  const sortedTemplates = [...filteredTemplates].sort((a, b) => {
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  });
+  const rangeStart = currentPage * TEMPLATES_PER_PAGE;
+  const sortedTemplates = sortPostsByCreatedDesc(filteredTemplates);
   const currentPageItems = sortedTemplates.slice(
-    start,
-    start + TEMPLATES_PER_PAGE
+    rangeStart,
+    rangeStart + TEMPLATES_PER_PAGE
   );
+
+  const handleSearchQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(0);
+  };
 
   if (isLoading) {
     return (
@@ -113,15 +105,6 @@ export default function MypageScreen() {
       </main>
     );
   }
-
-  const handleTemplateFilter = () => {
-    setFilterModalOpen(true);
-  };
-
-  const handleSearchQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(0);
-  };
 
   return (
     <main className="flex-1 ml-2 p-8 bg-navy-950 min-h-full">
@@ -158,153 +141,36 @@ export default function MypageScreen() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 bg-navy-900 p-4 rounded-xl border border-navy-700 shadow-sm">
-          <div className="flex-1">
-            <input
-              className="w-full pl-4 pr-4 py-2 bg-navy-800/50 border border-navy-600 rounded-lg focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 text-white placeholder:text-slate-500 text-sm outline-none transition-all"
-              placeholder="포스트 제목, 태그 검색..."
-              type="text"
-              value={searchQuery}
-              onChange={handleSearchQuery}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative group">
-              {filterModalOpen && (
-                <FilterModal
-                  setFilterModalOpen={setFilterModalOpen}
-                  templates={templates}
-                />
-              )}
-              <button
-                className="flex items-center gap-2 cursor-pointer px-3 py-2 bg-navy-800 border border-navy-600 rounded-lg text-sm font-medium text-slate-300 hover:bg-navy-700 transition-colors"
-                onClick={handleTemplateFilter}>
-                템플릿: {selectedTemplateType}
-                <ChevronDown className="size-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <MypageToolbar
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchQuery}
+          selectedTemplateType={selectedTemplateType}
+          filterModalOpen={filterModalOpen}
+          setFilterModalOpen={setFilterModalOpen}
+          templates={templates}
+        />
       </header>
 
       <div className="bg-navy-900 border border-navy-700 rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-y-auto">
-          <table className="w-full text-left border-collapse">
-            {user && (
-              <>
-                <thead>
-                  <tr className="bg-navy-800/50 border-b border-navy-700">
-                    <th className="w-1/2 px-6 py-4 text-xs font-bold text-slate-500">
-                      포스트 정보
-                    </th>
-                    <th className="w-1/4 px-6 py-4 text-xs font-bold text-slate-500">
-                      템플릿
-                    </th>
-                    <th className="w-1/4 px-6 py-4 text-xs font-bold text-slate-500 text-center">
-                      생성날짜
-                    </th>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 text-center whitespace-nowrap">
-                      관리
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-navy-700">
-                  {currentPageItems.map((template) => (
-                    <tr key={template.id}>
-                      <td className="px-6 py-4 text-white">
-                        <p className="text-sm font-medium">{template.title}</p>
-                        <p className="text-xs text-slate-400">
-                          {template.content?.slice(0, 50) ?? ""}
-                          {(template.content?.length ?? 0) > 50 ? "..." : ""}
-                        </p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
-                            template.template_type === "TIL"
-                              ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-                              : template.template_type === "Tutorial"
-                              ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
-                              : template.template_type === "Trouble_Shooting"
-                              ? "bg-amber-500/10 text-amber-300 border-amber-500/25"
-                              : "bg-navy-700/80 text-slate-400 border-navy-600"
-                          }`}>
-                          {template.template_type}
-                        </span>
-                      </td>
-                      <td>
-                        <p className="text-xs text-slate-400 text-center">
-                          {template.created_at
-                            ? new Date(template.created_at).toLocaleDateString()
-                            : "-"}
-                        </p>
-                      </td>
-                      <td className="px-6 py-4 text-center whitespace-nowrap">
-                        <button
-                          onClick={() => handleEditPost(template.id)}
-                          className="p-2 hover:bg-navy-700 rounded-lg text-slate-400 hover:text-slate-300 transition-colors cursor-pointer">
-                          <Pencil className="size-4" />
-                        </button>
-                        <button
-                          className="p-2 hover:bg-navy-700 rounded-lg text-slate-400 hover:text-slate-300 transition-colors cursor-pointer"
-                          onClick={() => openDeleteModal(template.id)}>
-                          <Trash2 className="size-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </>
-            )}
-          </table>
+          {user ? (
+            <MypagePostsTable
+              items={currentPageItems}
+              onEdit={handleEditPost}
+              onDelete={openDeleteModal}
+            />
+          ) : null}
         </div>
-        {user ? (
-          <div className="px-6 py-4 bg-navy-800/50 flex items-center justify-between border-t border-navy-700">
-            <p className="text-sm text-slate-500">
-              {filteredTemplates.length > 0
-                ? `Showing ${start + 1} to ${Math.min(
-                    start + TEMPLATES_PER_PAGE,
-                    filteredTemplates.length
-                  )} of ${filteredTemplates.length}`
-                : "0 posts"}
-            </p>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                className="p-2 rounded-lg hover:bg-navy-700 text-slate-500 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                disabled={currentPage === 0}
-                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}>
-                <ArrowLeft className="size-4" />
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  type="button"
-                  key={i}
-                  className={`size-8 rounded-lg font-medium text-sm transition-colors ${
-                    currentPage === i
-                      ? "bg-amber-500 text-navy-950"
-                      : "hover:bg-navy-700 text-slate-300"
-                  }`}
-                  onClick={() => setCurrentPage(i)}>
-                  {i + 1}
-                </button>
-              ))}
-              <button
-                type="button"
-                className="p-2 rounded-lg hover:bg-navy-700 text-slate-400 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
-                disabled={currentPage >= totalPages - 1}
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(totalPages - 1, p + 1))
-                }>
-                <ArrowRight className="size-4" />
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="px-6 py-4 bg-navy-800/50 flex items-center justify-between border-t border-navy-700">
-            <p className="text-sm text-slate-500">0 posts</p>
-          </div>
-        )}
+        <MypagePagination
+          isLoggedIn={!!user}
+          filteredCount={filteredTemplates.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          rangeStart={rangeStart}
+          onPageChange={setCurrentPage}
+          onPrev={() => setCurrentPage((p) => Math.max(0, p - 1))}
+          onNext={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+        />
       </div>
     </main>
   );
