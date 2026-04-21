@@ -2,7 +2,7 @@
 
 import { createClient } from "@/app/lib/supabase/client";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import SyntaxHighlighter from "react-syntax-highlighter";
@@ -14,7 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 type PostScreenProps = { postId?: string };
 
 export default function PostScreen({ postId }: PostScreenProps) {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = createClient();
   const [title, setTitle] = useState<string>(
     "기술 블로그 포스트 - 2024 AI 트렌드"
   );
@@ -36,7 +36,7 @@ export default function PostScreen({ postId }: PostScreenProps) {
       }
     };
     fetchPost();
-  }, [postId, supabase]);
+  }, [postId]);
 
   const handleEdit = async () => {
     const { error } = await supabase

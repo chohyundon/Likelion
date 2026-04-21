@@ -5,8 +5,8 @@ import Logo from "../Logo/Logo";
 import Link from "next/link";
 import { DashBoardSideList } from "@/app/constants/DashBoardSideList";
 import { createClient } from "@/app/lib/supabase/client";
-import { useRef, useState } from "react";
-import { useEffect, useMemo } from "react";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
+import { useEffect, useRef, useState } from "react";
 import HeaderModal from "../modal/header/HeaderModal";
 import AuthModal from "../modal/auth/AuthModal";
 
@@ -15,7 +15,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = createClient();
 
   // 홈에서는 Aside가 마운트되지 않아서, Header에서 세션 복원 및 구독
   useEffect(() => {
@@ -29,11 +29,13 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    } = supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, session: Session | null) => {
+        setUser(session?.user ?? null);
+      }
+    );
     return () => subscription.unsubscribe();
-  }, [supabase, setUser]);
+  }, [setUser]);
 
   useEffect(() => {
     if (user) setModalOpen(false);

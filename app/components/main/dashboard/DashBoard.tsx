@@ -4,8 +4,7 @@ import { TEMPLATE_ID } from "@/app/template/template";
 import DashBoardHeader from "./dashboardHeader/DashBoardHeader";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@/app/lib/supabase/client";
+import { useEffect, useState } from "react";
 import { DatabaseDocument } from "@/types/database";
 import Link from "next/link";
 import { useAuthStore } from "@/app/store/AuthStore";
@@ -20,7 +19,6 @@ const TEMPLATE_IMAGES: Record<string, string> = {
 };
 
 export default function DashBoard() {
-  const supabase = useMemo(() => createClient(), []);
   const [templates, setTemplates] = useState<DatabaseDocument[]>([]);
   const user = useAuthStore((state) => state.user);
 
@@ -34,20 +32,16 @@ export default function DashBoard() {
       setTemplates(templates ?? []);
     };
     getTemplates();
-  }, [supabase, user?.id]);
+  }, [user?.id]);
 
   console.log(templates);
 
-  const recentTemplates = useMemo(
-    () =>
-      [...templates]
-        .sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )
-        .slice(0, 3),
-    [templates]
-  );
+  const recentTemplates = [...templates]
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+    .slice(0, 3);
 
   return (
     <>

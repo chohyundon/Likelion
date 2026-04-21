@@ -2,8 +2,9 @@
 
 import { DashBoardSideList } from "@/app/constants/DashBoardSideList";
 import { createClient } from "@/app/lib/supabase/client";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { CircleUserRound, LogOut, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Modal from "../modal/Modal";
 import AuthModal from "../modal/auth/AuthModal";
 import { useAuthStore } from "@/app/store/AuthStore";
@@ -27,7 +28,7 @@ export default function Aside({ open = true, onClose }: AsideProps) {
     ? segment
     : "";
 
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = createClient();
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -49,11 +50,13 @@ export default function Aside({ open = true, onClose }: AsideProps) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    } = supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, session: Session | null) => {
+        setUser(session?.user ?? null);
+      }
+    );
     return () => subscription.unsubscribe();
-  }, [supabase, setUser]);
+  }, [setUser]);
 
   useEffect(() => {
     if (user) setOpenModal(false);
