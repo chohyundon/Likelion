@@ -6,21 +6,18 @@ import { TEMPLATES } from "@/app/constants/Template";
 import WriteSectionHeader from "../write/Header/WriteSectionHeader";
 import WriteInfoToolTip from "../write/infoTooltip/WriteInfoToolTip";
 import LoadingComponent from "../Loading/Loading";
-import { CheckCircle, Lightbulb, X } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { NAVY, dashboardWriteStyles } from "./dashboardWriteStyles";
 import { postOpenAi } from "@/app/services/postOpenAi";
-import { createClient } from "@/app/lib/supabase/client";
 import { useAuthStore } from "@/app/store/AuthStore";
 import { useRouter } from "next/navigation";
-
-const RECOMMENDED_KEYWORDS = ["JavaScript", "Optimization", "Web Dev"];
-
-const { inputBase, sectionCard, templateCardBase, keywordTag, suggestionBtn } =
-  dashboardWriteStyles;
+import { postTemplate } from "@/app/services/postTemplate";
+import WriteKeyWord from "./keyword/WriteKeyWord";
+import BottomCta from "./bottom/BottomCta";
+const { inputBase, sectionCard, templateCardBase } = dashboardWriteStyles;
 
 export default function DashBoardWrite() {
   const router = useRouter();
-  const supabase = createClient();
   const [selectedTemplate, setSelectedTemplate] = useState<string>("TIL");
   const [blogTitleValue, setBlogTitleValue] = useState<string>("");
   const [blogDescriptionValue, setBlogDescriptionValue] = useState<string>("");
@@ -30,7 +27,7 @@ export default function DashBoardWrite() {
     "성능 최적화",
     "프론트엔드",
   ]);
-  const [keywordInput, setKeywordInput] = useState("");
+
   const [generatedArticle, setGeneratedArticle] = useState<{
     title: string;
     content: string;
@@ -38,18 +35,6 @@ export default function DashBoardWrite() {
     template: string;
   } | null>(null);
   const user = useAuthStore((state) => state.user);
-
-  const removeKeyword = (index: number) => {
-    setKeywords((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const addKeyword = (word: string) => {
-    const trimmed = word.trim();
-    if (trimmed && !keywords.includes(trimmed)) {
-      setKeywords((prev) => [...prev, trimmed]);
-      setKeywordInput("");
-    }
-  };
 
   const handleGenerateArticle = async () => {
     setIsLoading(true);
@@ -88,24 +73,19 @@ export default function DashBoardWrite() {
     if (!generatedArticle || !generatedArticle.content.trim() || !user) return;
 
     const saveAndGoToPost = async () => {
-      const { data, error } = await supabase
-        .from("템플릿")
-        .insert([
-          {
-            title: generatedArticle.title,
-            content: generatedArticle.content,
-            template_type: generatedArticle.template,
-            keywords: generatedArticle.keywords,
-            user_id: user.id,
-          },
-        ])
-        .select("id")
-        .single();
+      const { data, error } = await postTemplate({
+        title: generatedArticle.title,
+        content: generatedArticle.content,
+        template_type: generatedArticle.template,
+        keywords: generatedArticle.keywords,
+        user_id: user.id,
+      });
 
       if (error) {
         console.error(error);
         return;
       }
+
       const id = data?.id;
       if (id) {
         router.push(`/post/${id}`);
@@ -136,11 +116,11 @@ export default function DashBoardWrite() {
             </p>
           </div>
 
-          <button
+          <Button
             onClick={handleSampleView}
-            className="flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-slate-700 text-slate-200 text-sm font-bold hover:bg-slate-600 border border-slate-600 transition-colors">
+            className="font-bold shadow-lg bg-amber-500 hover:bg-amber-600 transition-all text-white">
             샘플 보기
-          </button>
+          </Button>
         </section>
 
         <section className="space-y-8">
@@ -225,68 +205,10 @@ export default function DashBoardWrite() {
           </section>
 
           {/* 3. 핵심 키워드 */}
-          <section className={sectionCard}>
-            <WriteSectionHeader step={3} title="핵심 키워드" />
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2 p-3 bg-slate-800/40 border border-slate-600/50 rounded-lg min-h-[50px]">
-                {keywords.map((kw, i) => (
-                  <span key={`${kw}-${i}`} className={keywordTag}>
-                    {kw}
-                    <button
-                      type="button"
-                      onClick={() => removeKeyword(i)}
-                      className="cursor-pointer hover:opacity-80"
-                      aria-label={`${kw} 제거`}>
-                      <X className="size-4 text-slate-400 hover:text-white" />
-                    </button>
-                  </span>
-                ))}
-                <input
-                  className="flex-1 bg-transparent border-none outline-none text-sm text-white min-w-[120px] focus:ring-0 placeholder:text-slate-500"
-                  placeholder="키워드 추가..."
-                  type="text"
-                  value={keywordInput}
-                  onChange={(e) => setKeywordInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === ",") {
-                      e.preventDefault();
-                      addKeyword(keywordInput);
-                    }
-                  }}
-                />
-              </div>
-              <div className="flex items-center gap-4 flex-wrap">
-                <p className="text-xs text-slate-400">추천 키워드:</p>
-                <div className="flex gap-2">
-                  {RECOMMENDED_KEYWORDS.map((kw) => (
-                    <button
-                      key={kw}
-                      type="button"
-                      onClick={() => addKeyword(kw)}
-                      className={suggestionBtn}>
-                      {kw}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
+          <WriteKeyWord keywords={keywords} setKeywords={setKeywords} />
 
           {/* CTA */}
-          <div className="flex flex-wrap items-center justify-between gap-4 p-6 rounded-xl border border-amber-500/30 bg-amber-500/5">
-            <div className="flex items-center gap-3">
-              <Lightbulb className="size-8 text-amber-400" />
-              <div>
-                <p className="text-white font-bold leading-none">
-                  생성할 준비가 되셨나요?
-                </p>
-                <p className="text-slate-400 text-sm mt-1">
-                  AI가 몇 초 안에 초안을 작성해 드립니다.
-                </p>
-              </div>
-            </div>
-            <Button onClick={handleGenerateArticle}>AI 글 생성하기</Button>
-          </div>
+          <BottomCta handleGenerateArticle={handleGenerateArticle} />
         </section>
       </div>
     </main>

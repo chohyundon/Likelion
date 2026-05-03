@@ -12,7 +12,7 @@ export async function proxy(req: NextRequest) {
   } = await supabase.auth.getSession();
 
   // 보호할 경로
-  const protectedPaths = ["/write"];
+  const protectedPaths = ["/dashboard", "/write"];
 
   const isProtected = protectedPaths.some((path) =>
     req.nextUrl.pathname.startsWith(path)

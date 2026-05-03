@@ -4,8 +4,7 @@ const BADGE_BY_TYPE: Record<string, string> = {
   Trouble_Shooting: "bg-amber-500/10 text-amber-300 border-amber-500/25",
 };
 
-const BADGE_DEFAULT =
-  "bg-navy-700/80 text-slate-400 border-navy-600";
+const BADGE_DEFAULT = "bg-navy-700/80 text-slate-400 border-navy-600";
 
 export default function TemplateTypeBadge({
   templateType,
