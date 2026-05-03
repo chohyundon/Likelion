@@ -17,7 +17,7 @@ export default function BottomCta({ onStartFree }: BottomCtaProps) {
         </p>
         <Button
           onClick={onStartFree}
-          className="cursor-pointer text-white bg-amber-700 text-lg font-bold px-12 py-4 rounded-xl shadow-2xl hover:bg-amber-800 transition-all relative z-10">
+          className="cursor-pointer text-black bg-white text-lg font-bold px-12 py-4 rounded-xl shadow-2xl hover:bg-white/80 transition-all relative z-10">
           Get Started Free
         </Button>
       </div>

@@ -42,7 +42,7 @@ export default function MypageToolbar({
             />
           )}
           <Button
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-white"
             onClick={() => setFilterModalOpen(true)}>
             템플릿: {selectedTemplateType}
             <ChevronDown className="size-4" />

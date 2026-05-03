@@ -65,7 +65,7 @@ export default function FilterModal({
         className="absolute right-0 top-12 z-50 min-w-[200px] rounded-xl border border-navy-700 bg-navy-900 shadow-xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}>
         <div className="px-4 py-3 border-b border-navy-700">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+          <p className="text-xs font-bold uppercase tracking-wider text-white">
             템플릿 필터
           </p>
         </div>
