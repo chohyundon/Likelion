@@ -3,7 +3,6 @@ export const postTemplate = async (template: {
   content: string;
   template_type: string;
   keywords: string[];
-  user_id: string;
 }) => {
   const response = await fetch("/api/supabase", {
     method: "POST",
