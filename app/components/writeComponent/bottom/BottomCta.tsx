@@ -13,13 +13,8 @@ export default function BottomCta({
   setGeneratedArticle,
 }: BottomCtaProps) {
   const handleGenerateArticle = async () => {
-    const missing: string[] = [];
-    if (!blogTitleValue.trim()) missing.push("블로그 제목");
-    if (!blogDescriptionValue.trim()) missing.push("상세 설명");
-    if (!keywords.some((k) => k.trim())) missing.push("핵심 키워드");
-
-    if (missing.length > 0) {
-      toast.warning(`다음 정보를 입력해 주세요: ${missing.join(", ")}`);
+    if (blogTitleValue.trim() === "" || blogDescriptionValue.trim() === "") {
+      toast.warning("모든 필수 항목을 입력해 주세요.");
       return;
     }
 
