@@ -8,12 +8,12 @@ import WriteInfoToolTip from "../write/infoTooltip/WriteInfoToolTip";
 import LoadingComponent from "../Loading/Loading";
 import { CheckCircle } from "lucide-react";
 import { NAVY, dashboardWriteStyles } from "./dashboardWriteStyles";
-import { postOpenAi } from "@/app/services/postOpenAi";
 import { useAuthStore } from "@/app/store/AuthStore";
 import { useRouter } from "next/navigation";
 import { postTemplate } from "@/app/services/postTemplate";
 import WriteKeyWord from "./keyword/WriteKeyWord";
 import BottomCta from "./bottom/BottomCta";
+import { GeneratedArticle } from "@/app/types/BottomCtaType";
 const { inputBase, sectionCard, templateCardBase } = dashboardWriteStyles;
 
 export default function DashBoardWrite() {
@@ -28,45 +28,9 @@ export default function DashBoardWrite() {
     "프론트엔드",
   ]);
 
-  const [generatedArticle, setGeneratedArticle] = useState<{
-    title: string;
-    content: string;
-    keywords: string[];
-    template: string;
-  } | null>(null);
+  const [generatedArticle, setGeneratedArticle] =
+    useState<GeneratedArticle | null>(null);
   const user = useAuthStore((state) => state.user);
-
-  const handleGenerateArticle = async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await postOpenAi({
-        selectedTemplate,
-        blogTitleValue,
-        blogDescriptionValue,
-        keywords,
-      });
-      const keywordsArray =
-        typeof response.keywords === "string"
-          ? response.keywords
-              .split(",")
-              .map((k: string) => k.trim())
-              .filter(Boolean)
-          : Array.isArray(response.keywords)
-          ? response.keywords
-          : [];
-      setGeneratedArticle({
-        title: response.title ?? "",
-        content: response.content ?? "",
-        keywords: keywordsArray,
-        template: selectedTemplate,
-      });
-    } catch (e) {
-      console.error("AI 생성 실패:", e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   // 생성 성공 후 Supabase에 저장하고, 저장된 id로 /post/[id] 이동
   useEffect(() => {
@@ -208,7 +172,14 @@ export default function DashBoardWrite() {
           <WriteKeyWord keywords={keywords} setKeywords={setKeywords} />
 
           {/* CTA */}
-          <BottomCta handleGenerateArticle={handleGenerateArticle} />
+          <BottomCta
+            selectedTemplate={selectedTemplate}
+            blogTitleValue={blogTitleValue}
+            blogDescriptionValue={blogDescriptionValue}
+            keywords={keywords}
+            setIsLoading={setIsLoading}
+            setGeneratedArticle={setGeneratedArticle}
+          />
         </section>
       </div>
     </main>
