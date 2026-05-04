@@ -19,20 +19,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let admin;
-  try {
-    admin = createServiceRoleClient();
-  } catch {
-    return NextResponse.json(
-      {
-        error:
-          "서버에 SUPABASE_SERVICE_ROLE_KEY가 설정되지 않았습니다. Vercel 환경 변수를 확인해 주세요.",
-      },
-      { status: 500 }
-    );
-  }
-
-  const { data, error } = await admin
+  const { data, error } = await supabase
     .from("템플릿")
     .insert([
       {
