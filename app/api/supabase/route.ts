@@ -9,8 +9,7 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabase
     .from("템플릿")
     .insert([{ title, content, keywords, template_type, user_id }])
-    .select("id")
-    .single();
+    .select();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
