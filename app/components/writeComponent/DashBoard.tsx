@@ -35,24 +35,27 @@ export default function DashBoardWrite() {
   // 생성 성공 후 Supabase에 저장하고, 저장된 id로 /post/[id] 이동
   useEffect(() => {
     if (!generatedArticle || !generatedArticle.content.trim() || !user) return;
+    console.log(user);
 
     const saveAndGoToPost = async () => {
-      const { data, error } = await postTemplate({
-        title: generatedArticle.title,
-        content: generatedArticle.content,
-        template_type: generatedArticle.template,
-        keywords: generatedArticle.keywords,
-        user_id: user.id,
-      });
+      try {
+        const data = await postTemplate({
+          title: generatedArticle.title,
+          content: generatedArticle.content,
+          template_type: generatedArticle.template,
+          keywords: generatedArticle.keywords,
+          user_id: user.id,
+        });
 
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      const id = data?.id;
-      if (id) {
-        router.push(`/post/${id}`);
+        const row = Array.isArray(data) ? data[0] : data;
+        const id =
+          row && typeof row === "object" && "id" in row ? row.id : undefined;
+        if (id) {
+          router.push(`/post/${id}`);
+        }
+      } catch (err) {
+        console.error(err);
+        // 필요하면 toast/alert: err instanceof Error ? err.message : "저장 실패"
       }
     };
     saveAndGoToPost();
