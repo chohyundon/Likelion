@@ -6,6 +6,7 @@ export const postTemplate = async (template: {
 }) => {
   const response = await fetch("/api/supabase", {
     method: "POST",
+    credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(template),
   });

@@ -1,9 +1,10 @@
 import { createClient } from "@/app/lib/supabase/server";
+import { createServiceRoleClient } from "@/app/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const { title, content, keywords, template_type, user_id } =
-    await request.json();
+  const { title, content, keywords, template_type } = await request.json();
+
   const supabase = await createClient();
 
   const {
@@ -18,16 +19,30 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (user.id !== user_id) {
+  let admin;
+  try {
+    admin = createServiceRoleClient();
+  } catch {
     return NextResponse.json(
-      { error: "요청한 사용자와 로그인 사용자가 일치하지 않습니다." },
-      { status: 403 }
+      {
+        error:
+          "서버에 SUPABASE_SERVICE_ROLE_KEY가 설정되지 않았습니다. Vercel 환경 변수를 확인해 주세요.",
+      },
+      { status: 500 }
     );
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from("템플릿")
-    .insert([{ title, content, keywords, template_type, user_id }])
+    .insert([
+      {
+        title,
+        content,
+        keywords,
+        template_type,
+        user_id: user.id,
+      },
+    ])
     .select();
 
   if (error) {
