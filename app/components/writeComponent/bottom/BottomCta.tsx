@@ -48,7 +48,6 @@ export default function BottomCta({
         template: selectedTemplate,
       });
     } catch (e) {
-      console.error("AI 생성 실패:", e);
       toast.error("AI 글 생성 중 오류가 발생했습니다. 다시 시도해 주세요.");
     } finally {
       setIsLoading(false);
