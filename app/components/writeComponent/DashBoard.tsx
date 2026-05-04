@@ -35,6 +35,7 @@ export default function DashBoardWrite() {
   // 생성 성공 후 Supabase에 저장하고, 저장된 id로 /post/[id] 이동
   useEffect(() => {
     if (!generatedArticle || !generatedArticle.content.trim() || !user) return;
+    console.log(user);
 
     const saveAndGoToPost = async () => {
       try {
@@ -47,7 +48,8 @@ export default function DashBoardWrite() {
         });
 
         const row = Array.isArray(data) ? data[0] : data;
-        const id = row && typeof row === "object" && "id" in row ? row.id : undefined;
+        const id =
+          row && typeof row === "object" && "id" in row ? row.id : undefined;
         if (id) {
           router.push(`/post/${id}`);
         }
