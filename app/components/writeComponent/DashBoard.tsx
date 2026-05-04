@@ -37,22 +37,23 @@ export default function DashBoardWrite() {
     if (!generatedArticle || !generatedArticle.content.trim() || !user) return;
 
     const saveAndGoToPost = async () => {
-      const { data, error } = await postTemplate({
-        title: generatedArticle.title,
-        content: generatedArticle.content,
-        template_type: generatedArticle.template,
-        keywords: generatedArticle.keywords,
-        user_id: user.id,
-      });
+      try {
+        const data = await postTemplate({
+          title: generatedArticle.title,
+          content: generatedArticle.content,
+          template_type: generatedArticle.template,
+          keywords: generatedArticle.keywords,
+          user_id: user.id,
+        });
 
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      const id = data?.id;
-      if (id) {
-        router.push(`/post/${id}`);
+        const row = Array.isArray(data) ? data[0] : data;
+        const id = row && typeof row === "object" && "id" in row ? row.id : undefined;
+        if (id) {
+          router.push(`/post/${id}`);
+        }
+      } catch (err) {
+        console.error(err);
+        // 필요하면 toast/alert: err instanceof Error ? err.message : "저장 실패"
       }
     };
     saveAndGoToPost();
