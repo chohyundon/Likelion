@@ -14,7 +14,7 @@ export default function BottomCta({
 }: BottomCtaProps) {
   const handleGenerateArticle = async () => {
     if (blogTitleValue.trim() === "" || blogDescriptionValue.trim() === "") {
-      toast.warning("모든 필수 항목을 입력해 주세요.");
+      toast.warning("블로그 제목 아이디어, 상세 설명을 입력해 주세요.");
       return;
     }
 
