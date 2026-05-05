@@ -4,7 +4,7 @@ export const getTemplate = async (templateId: string) => {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("템플릿")
+    .from("posts")
     .select("*")
     .eq("id", templateId)
     .single();

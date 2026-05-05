@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { data, error } = await supabase
-    .from("템플릿")
+    .from("posts")
     .insert([
       {
         title,

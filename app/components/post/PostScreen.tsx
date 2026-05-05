@@ -25,7 +25,7 @@ export default function PostScreen({ postId }: PostScreenProps) {
     if (!postId) return;
     const fetchPost = async () => {
       const { data, error } = await supabase
-        .from("템플릿")
+        .from("posts")
         .select("title, content, template_type")
         .eq("id", postId)
         .single();
@@ -40,7 +40,7 @@ export default function PostScreen({ postId }: PostScreenProps) {
 
   const handleEdit = async () => {
     const { error } = await supabase
-      .from("템플릿")
+      .from("posts")
       .update({ content: content.trim() })
       .eq("id", postId)
       .select();

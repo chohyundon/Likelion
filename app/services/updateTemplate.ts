@@ -8,7 +8,7 @@ export const updateTemplate = async (
   const supabase = await createClient();
 
   const { error } = await supabase
-    .from("템플릿")
+    .from("posts")
     .update(template)
     .eq("id", templateId);
   if (error) console.error(error);
