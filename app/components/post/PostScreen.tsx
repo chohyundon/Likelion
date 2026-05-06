@@ -10,7 +10,6 @@ import { prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "./markDown.css";
 import { ChevronRight, Sparkles, FileDown } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
-
 type PostScreenProps = { postId?: string };
 
 export default function PostScreen({ postId }: PostScreenProps) {

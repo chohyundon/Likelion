@@ -36,3 +36,13 @@ export async function POST(request: NextRequest) {
   }
   return NextResponse.json({ data, error });
 }
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.from("posts").select("*").eq("id", id);
+  return NextResponse.json({ data, error });
+}

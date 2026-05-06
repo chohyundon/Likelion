@@ -14,6 +14,7 @@ import { postTemplate } from "@/app/services/postTemplate";
 import WriteKeyWord from "./keyword/WriteKeyWord";
 import BottomCta from "./bottom/BottomCta";
 import { GeneratedArticle } from "@/app/types/BottomCtaType";
+import { getAllTemplates } from "@/app/services/getTemplate";
 const { inputBase, sectionCard, templateCardBase } = dashboardWriteStyles;
 
 export default function DashBoardWrite() {
@@ -37,6 +38,9 @@ export default function DashBoardWrite() {
     if (!generatedArticle || !generatedArticle.content.trim() || !user) return;
 
     const saveAndGoToPost = async () => {
+      const templates = await getAllTemplates();
+      console.log(templates);
+
       try {
         const data = await postTemplate({
           title: generatedArticle.title,
