@@ -44,9 +44,9 @@ export default function BottomCta({
       });
     } catch (e) {
       toast.error("AI 글 생성 중 오류가 발생했습니다. 다시 시도해 주세요.");
-    } finally {
       setIsLoading(false);
     }
+    // 생성 성공 시에는 로딩을 유지한다. 부모가 저장 후 router.push 하거나 실패 시 끈다.
   };
 
   return (

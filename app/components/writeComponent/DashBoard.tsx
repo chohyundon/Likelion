@@ -15,6 +15,7 @@ import WriteKeyWord from "./keyword/WriteKeyWord";
 import BottomCta from "./bottom/BottomCta";
 import { GeneratedArticle } from "@/app/types/BottomCtaType";
 import { getAllTemplates } from "@/app/services/getTemplate";
+import { toast } from "react-toastify";
 const { inputBase, sectionCard, templateCardBase } = dashboardWriteStyles;
 
 export default function DashBoardWrite() {
@@ -39,7 +40,11 @@ export default function DashBoardWrite() {
 
     const saveAndGoToPost = async () => {
       const templates = await getAllTemplates();
-      console.log(templates);
+      if ((templates?.length ?? 0) >= 10) {
+        toast.error("최대 10개의 포스트만 저장할 수 있습니다.");
+        setIsLoading(false);
+        return;
+      }
 
       try {
         const data = await postTemplate({
@@ -54,11 +59,16 @@ export default function DashBoardWrite() {
           row && typeof row === "object" && "id" in row ? row.id : undefined;
         if (id) {
           router.push(`/post/${id}`);
+          return;
         }
+        toast.error("저장은 되었지만 글 페이지로 이동할 수 없습니다.");
       } catch (err) {
         console.error(err);
-        // 필요하면 toast/alert: err instanceof Error ? err.message : "저장 실패"
+        toast.error(
+          err instanceof Error ? err.message : "저장에 실패했습니다."
+        );
       }
+      setIsLoading(false);
     };
     saveAndGoToPost();
   }, [generatedArticle, user, router]);
